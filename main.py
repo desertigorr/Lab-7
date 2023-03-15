@@ -66,6 +66,8 @@ plt.ylabel('Расход воздуха (кг/ч)')
 plt.plot(position, consumption, 'o')
 plt.show()
 
+
+# Task 3
 x = np.linspace(np.pi*(-1), np.pi, 100)
 
 y = np.zeros(len(x), float)

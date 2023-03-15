@@ -1,55 +1,82 @@
+import time as time
 import numpy as np
+import random
+import math
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
-def start():
-    arr = np.array([5, 9, 10, 'ad', 7])
-    arr = arr[::-1]
-    print(arr)
+# Task 1
+def create_array():
+    return [(random.randint(1, 1000)) for i in range(10**6)]
 
 
-def tableLoad():
-    arr = np.genfromtxt('voltage.csv', delimiter=',')
-    time = arr[:100,0]
-    time = time[:,np.newaxis]
-    curr = arr[:100,1]
-    curr = curr[:,np.newaxis]
-    volt = arr[:100,2]
-    volt = volt[:,np.newaxis]
+def compare(a, b):
 
-    plt.plot(time, curr * 50, 'b', time, volt, 'r')
-    plt.show()
+    # Python algorithm
+    array_res = []
+    start_time = time.perf_counter()
+    for i in range(10**6):
+        array_res.append(a[i] * b[i])
+    total_time_py = time.perf_counter() - start_time
 
+    # NumPy algorithm
+    start_time = time.perf_counter()
+    array_res = np.multiply(a, b)
+    total_time_np = time.perf_counter() - start_time
 
-def hist():
-    arr = np.genfromtxt('test.csv', delimiter=',')
-    arr = arr[1:]
-    daysInYear = 365.25
-
-    age = np.int_(arr[:,1] / daysInYear)
-
-    fig = plt.figure(figsize=(6, 4))
-    ax = fig.add_subplot()
-    ax.hist(age, 100, (50, 60))
-    ax.grid()
-    plt.show()
+    print(f'Python time: {total_time_py}\nNumPy time: {total_time_np}')
+    print(f"NumPy's performance was {100 - math.floor(total_time_np/total_time_py*100)}% faster")
 
 
-def plot3d():
-    np.random.seed(40)
-    xs = np.linspace(0, 10, 20)
-    ys = xs
-    zs = np.sin(xs)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot(xs, ys, zs, marker='x', c='red')
-    plt.show()
+array_one = create_array()
+array_two = create_array()
+compare(array_one, array_two)
 
 
-if __name__ == '__main__':
-    #start()
-    #tableLoad()
-    #hist()
-    plot3d()
+# Task 2
+consumption_arr = []
+time_arr = []
+position_arr = []
+
+with open('data1.csv', 'r') as f:
+    for line in f:
+        res = line.split(';')
+        time_arr.append(res[0])
+        position_arr.append(res[3])
+        consumption_arr.append(res[15])
+    f.close()
+
+for arr in (time_arr, position_arr, consumption_arr):
+    arr.pop(0)
+
+time = np.array(time_arr, float)
+consumption = np.array(consumption_arr, float)
+position = np.array(position_arr, float)
+
+plt.title('Положение дросселя и расход воздуха в течении времени')
+plt.xlabel('Время')
+plt.ylabel(f'Положение дросселя и расход воздуха (кг/ч)')
+plt.plot(np.array(time), np.array(position))
+plt.plot(np.array(time), np.array(consumption))
+plt.show()
+
+plt.title('График корреляции')
+plt.xlabel('Положение дросселя')
+plt.ylabel('Расход воздуха (кг/ч)')
+plt.plot(position, consumption, 'o')
+plt.show()
+
+x = np.linspace(np.pi*(-1), np.pi, 100)
+
+y = np.zeros(len(x), float)
+for i in range(len(x)):
+    y[i] = math.sin(x[i]) * math.cos(x[i])
+
+z = np.zeros(len(x), float)
+for i in range(len(x)):
+    z[i] = math.sin(x[i])
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.plot(x, y, z)
+plt.show()
